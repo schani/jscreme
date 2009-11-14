@@ -12,12 +12,12 @@
   (list (apply list 'lambda '() bodies)))
 
 (defmacro cond cases
-  (let ((recur (lambda (cases)
-		 (if (null? cases)
-		     '()
-		     (if (eq? (caar cases 'else))
-			 (cadar cases)
-			 (list if (caar cases) (cadar cases) (recur (cdr cases))))))))
+  (letrec ((recur (lambda (cases)
+		    (if (null? cases)
+			#f
+			(if (eq? (caar cases) 'else)
+			    (cadar cases)
+			    (list 'if (caar cases) (cadar cases) (recur (cdr cases))))))))
     (recur cases)))
 
 (defmacro and args
@@ -27,6 +27,15 @@
 			(list 'if (car args) (recur (cdr args)) #f)))))
     (if (null? args)
 	#t
+	(recur args))))
+
+(defmacro or args
+  (letrec ((recur (lambda (args)
+		    (if (null? (cdr args))
+			(car args)
+			(list 'if (car args) #t (recur (cdr args)))))))
+    (if (null? args)
+	#f
 	(recur args))))
 
 (define (error & args)
@@ -92,6 +101,10 @@
   (if (null? rest)
       (js-op 0 "-" x)
       (js-op x "-" (apply + rest))))
+
+(define (vector? x)
+  (and (not (null? x))
+       (js-op (.. x constructor) "==" (js-quote "Array"))))
 
 (define (listify-vector vec start)
   (letrec ((recur (lambda (i l)

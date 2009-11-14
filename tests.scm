@@ -17,6 +17,12 @@
 (assert (not (number? '())))
 (assert (not (number? #f)))
 
+(assert (vector? (vector)))
+(assert (vector? (vector 1 2)))
+(assert (not (vector? '())))
+(assert (not (vector? 0)))
+(assert (not (vector? "abc")))
+
 ;(assert (equal? '() '()))
 ;(assert (equal? 1 1))
 ;(assert (equal? 'x 'x))
