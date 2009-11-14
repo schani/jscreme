@@ -23,7 +23,17 @@
       (recur 0 ""))))
 
 (define (quote-string str)
-  (string-append "\"" str "\""))
+  (let ((len (string-length str)))
+    (letrec ((recurse (lambda (i so-far)
+			(if (< i len)
+			    (let ((c (string-ref str i)))
+			      (recurse (+ i 1)
+				       (string-append so-far
+						      (if (eq? c #\")
+							  "\\\""
+							  (string c)))))
+			    so-far))))
+      (string-append (recurse 0 "\"") "\""))))
 
 ;; () -> null
 ;; 123 -> 123
