@@ -8,6 +8,7 @@
 						(let ((c (string-ref str i)))
 						  (case c
 						    ((#\?) "_qm_")
+						    ((#\=) "_eq_")
 						    ((#\<) "_lt_")
 						    ((#\>) "_gt_")
 						    ((#\-) "___")
@@ -230,21 +231,6 @@
 				    (string-append (compile (car exprs) env) ";\n"
 						   (recur (cdr exprs) env macros))))))))))
     (recur exprs '() '())))
-
-(defmacro js-define (def body)
-  ''())
-
-(defmacro js-macro (def body)
-  ''())
-
-(js-macro (cond & cases)
-	  (let ((recur (lambda (cases)
-			 (if (null? cases)
-			     '()
-			     (if (eq? (caar cases 'else))
-				 (cadar cases)
-				 (list if (caar cases) (cadar cases) (recur (cdr cases))))))))
-	    (recur cases)))
 
 (call-with-output-file "tests.js"
   (lambda (port)

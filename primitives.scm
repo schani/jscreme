@@ -11,6 +11,24 @@
 (defmacro begin bodies
   (list (apply list 'lambda '() bodies)))
 
+(defmacro cond cases
+  (let ((recur (lambda (cases)
+		 (if (null? cases)
+		     '()
+		     (if (eq? (caar cases 'else))
+			 (cadar cases)
+			 (list if (caar cases) (cadar cases) (recur (cdr cases))))))))
+    (recur cases)))
+
+(defmacro and args
+  (letrec ((recur (lambda (args)
+		    (if (null? (cdr args))
+			(car args)
+			(list 'if (car args) (recur (cdr args)) #f)))))
+    (if (null? args)
+	#t
+	(recur args))))
+
 (define (error & args)
   ((js-quote "function (x){throw x;}") args))
 
@@ -27,6 +45,13 @@
 
 (define (null? x)
   (eq? x '()))
+
+(define (number? x)
+  (and (not (null? x))
+       (js-op (.. x constructor) "==" (js-quote "Number"))))
+
+(define (= a b)
+  (js-op a "==" b))
 
 (define (< a b)
   (js-op a "<" b))
