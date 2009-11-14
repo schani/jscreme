@@ -64,7 +64,9 @@
   (fold-left (lambda (a b) (js-op a "+" b)) 0 args))
 
 (define (- x & rest)
-  (js-op x "-" (apply + rest)))
+  (if (null? rest)
+      (js-op 0 "-" x)
+      (js-op x "-" (apply + rest))))
 
 (define (listify-vector vec start)
   (letrec ((recur (lambda (i l)

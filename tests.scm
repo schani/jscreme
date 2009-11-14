@@ -24,3 +24,12 @@
 (assert (eq? (car (cons 1 2)) 1))
 (assert (eq? (cdr (cons 1 2)) 2))
 (assert (eq? (cdr '(0)) '()))
+
+(assert (eq? (+) 0))
+(assert (eq? (+ 1) 1))
+(assert (eq? (+ 1 2) 3))
+(assert (eq? (+ 1 2 3) 6))
+
+(assert (eq? (- 1) -1))
+(assert (eq? (- 3 1) 2))
+;(assert (eq? (- 3 1 2)) 0)
