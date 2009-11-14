@@ -9,6 +9,7 @@
 						  (case c
 						    ((#\?) "_qm_")
 						    ((#\<) "_lt_")
+						    ((#\>) "_gt_")
 						    ((#\-) "___")
 						    ((#\+) "_plus_")
 						    ((#\*) "_star_")
@@ -74,7 +75,7 @@
 ;; (js-object (a x) (b y)) -> { a: x, b: y }
 ;; (js-op a "==" b) -> (a == b)
 ;; (js-quote "null") -> null
-;; (apply f a b c) -> (f.apply (null, [a, b].concat (c)))
+;; (apply f a b c) -> (f.apply (null, [a, b].concat (list____gt_vector(c))))
 ;; (lambda (a b) c) -> function (a,b) { return c; }
 ;; (lambda (a b & c) d) -> function (a,b) { var c = listify___vector (arguments, 2); return d; }
 ;; (letrec/let* ((a x) (b y)) c) -> (function () { var a = x; var b = y; return c; } ())
@@ -113,13 +114,13 @@
 					     (cdr expr)))
 			     "}"))
 	     ((js-op)
-	      (string-append (compile (cadr expr) env) " " (caddr expr) " " (compile (cadddr expr) env)))
+	      (string-append "(" (compile (cadr expr) env) " " (caddr expr) " " (compile (cadddr expr) env) ")"))
 	     ((js-quote)
 	      (cadr expr))
 	     ((apply)
 	      (letrec ((compile-args (lambda (args)
 				       (if (null? (cdr args))
-					   (string-append "].concat(" (car args))
+					   (string-append "].concat(" (jsify-symbol 'list->vector) "(" (car args) ")")
 					   (string-append (car args) "," (compile-args (cdr args)))))))
 		(string-append "("
 			       (compile (cadr expr) env)

@@ -8,6 +8,9 @@
 (defmacro let (bindings . bodies)
   (apply list (apply list 'lambda (map car bindings) bodies) (map cadr bindings)))
 
+(defmacro begin bodies
+  (list (apply list 'lambda '() bodies)))
+
 (define (error & args)
   ((js-quote "function (x){throw x;}") args))
 
@@ -69,6 +72,22 @@
 			l
 			(recur (js-op i "-" 1) (cons (vector-ref vec i) l))))))
     (recur (js-op (vector-length vec) "-" 1) '())))
+
+(define (vector->list vec)
+  (listify-vector vec 0))
+
+(define (list->vector l)
+  (let ((vec (js-quote "[]")))
+    (letrec ((recur (lambda (l)
+		      (if (null? l)
+			  vec
+			  (begin
+			    ((.. vec push) (car l))
+			    (recur (cdr l)))))))
+      (recur l))))
+
+(define (vector & args)
+  (list->vector args))
 
 (define (list & args)
   args)
