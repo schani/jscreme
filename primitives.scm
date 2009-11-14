@@ -97,6 +97,14 @@
 	(vector-set! *interned* str sym)
 	sym)))
 
+(define (symbol? x)
+  (and (not (null? x))
+       (js-op (.. x constructor) "==" (js-quote "Object"))
+       (js-op "symbol" "in" x)))
+
+(define (symbol->string x)
+  (.. x symbol))
+
 (load "utils.scm")
 
 (define (+ & args)
@@ -145,3 +153,20 @@
 
 (define (length l)
   (fold-left (lambda (count x) (+ count 1)) 0 l))
+
+(define (equal? a b)
+  (cond ((pair? a)
+	 (and (pair? b)
+	      (equal? (car a) (car b))
+	      (equal? (cdr a) (cdr b))))
+	((vector? a)
+	 (and (vector? b)
+	      (let ((len (vector-length a)))
+		(and (= len (vector-length b))
+		     (letrec ((recur (lambda (i)
+				       (or (= i len)
+					   (and (equal? (vector-ref a i) (vector-ref b i))
+						(recur (+ i 1)))))))
+		       (recur 0))))))
+	(else
+	 (eq? a b))))
