@@ -94,6 +94,10 @@
 (assert (equal? (string-append "a") "a"))
 (assert (equal? (string-append "a" "bcd" "e") "abcde"))
 
+(assert (equal? (string) ""))
+(assert (equal? (string #\a) "a"))
+(assert (equal? (string #\a #\b #\c) "abc"))
+
 (assert (equal? (map (lambda (x) (error 'must-not-be-called)) '()) '()))
 (assert (equal? (map (lambda (x) (+ x 1)) '(1 2 3)) '(2 3 4)))
 

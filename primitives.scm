@@ -38,6 +38,21 @@
 	#f
 	(recur args))))
 
+(defmacro case (val . cases)
+  (let ((sym '-*-val-*-))
+    (letrec ((recur (lambda (args)
+		      (if (null? args)
+			  #f
+			  (let ((cases (caar args))
+				(value (cadar args)))
+			    (if (eq? cases 'else)
+				value
+				(list 'if (cons 'or (map (lambda (x) (list 'eq? sym x)) cases))
+				      value
+				      (recur (cdr args)))))))))
+      (list 'let (list (list sym val))
+	    (recur cases)))))
+
 (define (not x)
   (if x #f #t))
 
@@ -161,6 +176,8 @@
 
 (define (string-append & args)
   (fold-left (lambda (a b) (js-op a "+" b)) "" args))
+
+(define string string-append)
 
 (define (map f l)
   (fold-right (lambda (x xs) (cons (f x) xs)) l '()))
