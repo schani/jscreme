@@ -228,7 +228,7 @@
 				    (let ((more-exprs (read-file (cadr expr))))
 				      (recur (append more-exprs (cdr exprs)) env macros)))
 				   (else
-				    (string-append (compile (car exprs) env) ";\n"
+				    (string-append (compile expr env) ";\n"
 						   (recur (cdr exprs) env macros))))))))))
     (recur exprs '() '())))
 
