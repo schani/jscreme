@@ -17,6 +17,12 @@
 (assert (not (number? '())))
 (assert (not (number? #f)))
 
+(assert (pair? (cons 1 2)))
+(assert (not (pair? '())))
+(assert (not (pair? 1)))
+(assert (not (pair? "abc")))
+(assert (not (pair? (vector 1 2))))
+
 (assert (vector? (vector)))
 (assert (vector? (vector 1 2)))
 (assert (not (vector? '())))

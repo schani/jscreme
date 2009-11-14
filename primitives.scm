@@ -65,6 +65,11 @@
 (define (< a b)
   (js-op a "<" b))
 
+(define (pair? x)
+  (and (not (null? x))
+       (js-op (.. x constructor) "==" (js-quote "Object"))
+       (js-op "car" "in" x)))
+
 (define (car x)
   (.. x car))
 
