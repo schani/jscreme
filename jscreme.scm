@@ -213,7 +213,7 @@
 			     (recur (cdr exprs) env
 				    (cons (cons name (eval (list 'lambda args
 								 (macroexpand value macros))
-							   (scheme-report-environment 5)))
+							   (interaction-environment)))
 					  macros))))
 			  (else
 			   (let ((expr (macroexpand (car exprs) macros)))
