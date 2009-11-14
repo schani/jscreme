@@ -153,6 +153,12 @@
   (and (not (null? x))
        (js-op (.. x constructor) "==" (js-quote "String"))))
 
+(define (string-length s)
+  (.. s length))
+
+(define (string-ref s i)
+  ((js-quote "function(s,i){return s[i];}") s i))
+
 (define (string-append & args)
   (fold-left (lambda (a b) (js-op a "+" b)) "" args))
 

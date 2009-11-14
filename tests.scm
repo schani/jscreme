@@ -31,6 +31,11 @@
 (assert (not (string? (cons "1" "2"))))
 (assert (not (string? (vector))))
 
+(assert (= (string-length "") 0))
+(assert (= (string-length "abc") 3))
+
+(assert (eq? (string-ref "abc" 1) #\b))
+
 (assert (pair? (cons 1 2)))
 (assert (not (pair? '())))
 (assert (not (pair? 1)))
