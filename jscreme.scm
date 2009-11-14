@@ -96,7 +96,7 @@
 				      (else
 				       (string-append (compile (car l) env) ";\n"
 						      (compile-body-list (cdr l) env)))))))
-    (cond ((or (number? expr) (string? expr) (boolean? expr))
+    (cond ((or (number? expr) (char? expr) (string? expr) (boolean? expr))
 	   (quote-to-string expr))
 	  ((symbol? expr)
 	   (let ((str (jsify-symbol expr)))
