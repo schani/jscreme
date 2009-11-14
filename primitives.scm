@@ -38,14 +38,6 @@
 	#f
 	(recur args))))
 
-(define (error & args)
-  ((js-quote "function (x){throw x;}") args))
-
-(define (assert x)
-  (if x
-      #t
-      (error 'assertion-failed)))
-
 (define (not x)
   (if x #f #t))
 
@@ -65,6 +57,9 @@
 (define (< a b)
   (js-op a "<" b))
 
+(define (number->string x)
+  ((.. x toString)))
+
 (define (pair? x)
   (and (not (null? x))
        (js-op (.. x constructor) "==" (js-quote "Object"))
@@ -78,6 +73,9 @@
 
 (define (cons a b)
   (js-object (car a) (cdr b)))
+
+(define (list & args)
+  args)
 
 (define (vector-ref v i)
   ((js-quote "function(v,i){return v[i];}") v i))
@@ -142,8 +140,18 @@
 (define (vector & args)
   (list->vector args))
 
-(define (list & args)
-  args)
+(define (error & args)
+  ((js-quote "function (x){throw x;}") (list->vector args)))
+
+(defmacro assert (x)
+  (let ((fail-message (string-append "assertion " (display-to-string x) " failed")))
+    (list 'if x
+	  #t
+	  (list 'error fail-message))))
+
+(define (string? x)
+  (and (not (null? x))
+       (js-op (.. x constructor) "==" (js-quote "String"))))
 
 (define (string-append & args)
   (fold-left (lambda (a b) (js-op a "+" b)) "" args))
@@ -170,3 +178,32 @@
 		       (recur 0))))))
 	(else
 	 (eq? a b))))
+
+(define (display-to-string x)
+  (cond ((null? x)
+	 "()")
+	((number? x)
+	 (number->string x))
+	((string? x)
+	 x)
+	((symbol? x)
+	 (symbol->string x))
+	((pair? x)
+	 (letrec ((recur (lambda (x so-far)
+			   (if (pair? x)
+			       (if (null? (cdr x))
+				   (string-append so-far (display-to-string (car x)) ")")
+				   (recur (cdr x) (string-append so-far (display-to-string (car x)) " ")))
+			       (string-append so-far ". " (display-to-string x) ")")))))
+	   (recur x "(")))
+	((vector? x)
+	 (let ((last (- (vector-length x) 1)))
+	   (letrec ((recur (lambda (i so-far)
+			     (if (< i last)
+				 (recur (+ i 1) (string-append so-far (display-to-string (vector-ref x i)) " "))
+				 so-far))))
+	     (string-append (recur 0 "[")
+			    (if (= last -1) "" (display-to-string (vector-ref x last)))
+			    "]"))))
+	(else
+	 (error 'cannot-display))))

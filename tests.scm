@@ -25,6 +25,12 @@
 
 (assert (equal? (symbol->string 'abc) "abc"))
 
+(assert (string? "abc"))
+(assert (not (string? '())))
+(assert (not (string? 'abc)))
+(assert (not (string? (cons "1" "2"))))
+(assert (not (string? (vector))))
+
 (assert (pair? (cons 1 2)))
 (assert (not (pair? '())))
 (assert (not (pair? 1)))
@@ -48,6 +54,8 @@
 (assert (not (equal? '(1 2 3) '(1 2 3 4))))
 (assert (equal? "abc" "abc"))
 (assert (equal? (vector 1 2 3) (vector 1 2 3)))
+(assert (not (equal? (vector 1 2 3) (vector 1 2 4))))
+(assert (not (equal? (vector 1 2 3) (vector 1 2 3 4))))
 
 (assert (null? '()))
 (assert (not (null? 0)))
@@ -74,3 +82,27 @@
 (assert (eq? (- 3 1) 2))
 (assert (eq? (- 3 1 2) 0))
 
+(assert (equal? (list->vector '(1 2 3)) (vector 1 2 3)))
+(assert (equal? (vector->list (vector 1 2 3)) '(1 2 3)))
+
+(assert (equal? (string-append) ""))
+(assert (equal? (string-append "a") "a"))
+(assert (equal? (string-append "a" "bcd" "e") "abcde"))
+
+(assert (equal? (map (lambda (x) (error 'must-not-be-called)) '()) '()))
+(assert (equal? (map (lambda (x) (+ x 1)) '(1 2 3)) '(2 3 4)))
+
+(assert (equal? (length '()) 0))
+(assert (equal? (length '(a)) 1))
+(assert (equal? (length '(a b)) 2))
+(assert (equal? (length '(a b c d e)) 5))
+
+(assert (equal? (display-to-string '()) "()"))
+(assert (equal? (display-to-string 123) "123"))
+(assert (equal? (display-to-string "abc") "abc"))
+(assert (equal? (display-to-string 'abc) "abc"))
+(assert (equal? (display-to-string '(1 2 3)) "(1 2 3)"))
+(assert (equal? (display-to-string '(1 2 . 3)) "(1 2 . 3)"))
+(assert (equal? (display-to-string (vector)) "[]"))
+(assert (equal? (display-to-string (vector 1)) "[1]"))
+(assert (equal? (display-to-string (vector 1 2 3)) "[1 2 3]"))

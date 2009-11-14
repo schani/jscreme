@@ -1,3 +1,6 @@
+(define (display-to-string x)
+  (call-with-output-string (lambda (port) (display x port))))
+
 (define (jsify-symbol sym)
   (let* ((str (symbol->string sym))
 	 (len (string-length str)))
