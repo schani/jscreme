@@ -96,6 +96,10 @@
 (assert (eq? (- 3 1) 2))
 (assert (eq? (- 3 1 2) 0))
 
+(assert (equal? (append) '()))
+(assert (equal? (append '() '()) '()))
+(assert (equal? (append '(1 2) '() '(3)) '(1 2 3)))
+
 (assert (equal? (list->vector '(1 2 3)) (vector 1 2 3)))
 (assert (equal? (vector->list (vector 1 2 3)) '(1 2 3)))
 

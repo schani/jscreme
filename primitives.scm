@@ -1,15 +1,15 @@
-(defmacro define (name value)
+(defmacro begin bodies
+  (list (apply list 'lambda '() bodies)))
+
+(defmacro define (name . body-list)
   (if (pair? name)
       (let ((name (car name))
 	    (args (cdr name)))
-	(list 'js-define name (list 'lambda args value)))
-      (list 'js-define name value)))
+	(list 'js-define name (apply list 'lambda args body-list)))
+      (list 'js-define name (apply list 'begin body-list))))
 
 (defmacro let (bindings . bodies)
   (apply list (apply list 'lambda (map car bindings) bodies) (map cadr bindings)))
-
-(defmacro begin bodies
-  (list (apply list 'lambda '() bodies)))
 
 (defmacro cond cases
   (letrec ((recur (lambda (cases)
@@ -47,7 +47,7 @@
 				(value (cadar args)))
 			    (if (eq? cases 'else)
 				value
-				(list 'if (cons 'or (map (lambda (x) (list 'eq? sym x)) cases))
+				(list 'if (cons 'or (map (lambda (x) (list 'eq? sym (list 'quote x))) cases))
 				      value
 				      (recur (cdr args)))))))))
       (list 'let (list (list sym val))
@@ -88,6 +88,37 @@
 
 (define (cdr x)
   (.. x cdr))
+
+(define (caar x) (car (car x)))
+(define (cadr x) (car (cdr x)))
+(define (cdar x) (cdr (car x)))
+(define (cddr x) (cdr (cdr x)))
+
+(define (caaar x) (car (car (car x))))
+(define (caadr x) (car (car (cdr x))))
+(define (cadar x) (car (cdr (car x))))
+(define (caddr x) (car (cdr (cdr x))))
+(define (cdaar x) (cdr (car (car x))))
+(define (cdadr x) (cdr (car (cdr x))))
+(define (cddar x) (cdr (cdr (car x))))
+(define (cdddr x) (cdr (cdr (cdr x))))
+
+(define (caaaar x) (car (car (car (car x)))))
+(define (caaadr x) (car (car (car (cdr x)))))
+(define (caadar x) (car (car (cdr (car x)))))
+(define (caaddr x) (car (car (cdr (cdr x)))))
+(define (cadaar x) (car (cdr (car (car x)))))
+(define (cadadr x) (car (cdr (car (cdr x)))))
+(define (caddar x) (car (cdr (cdr (car x)))))
+(define (cadddr x) (car (cdr (cdr (cdr x)))))
+(define (cdaaar x) (cdr (car (car (car x)))))
+(define (cdaadr x) (cdr (car (car (cdr x)))))
+(define (cdadar x) (cdr (car (cdr (car x)))))
+(define (cdaddr x) (cdr (car (cdr (cdr x)))))
+(define (cddaar x) (cdr (cdr (car (car x)))))
+(define (cddadr x) (cdr (cdr (car (cdr x)))))
+(define (cdddar x) (cdr (cdr (cdr (car x)))))
+(define (cddddr x) (cdr (cdr (cdr (cdr x)))))
 
 (define (cons a b)
   (js-object (car a) (cdr b)))
@@ -186,8 +217,28 @@
 
 (define string string-append)
 
+(define (append & args)
+  (letrec ((recur (lambda (ls)
+		    (cond ((null? (cdr ls))
+			   (car ls))
+			  ((null? (car ls))
+			   (recur (cdr ls)))
+			  (else
+			   (cons (caar ls) (recur (cons (cdar ls) (cdr ls)))))))))
+    (if (null? args)
+	'()
+	(recur args))))
+
 (define (map f l)
   (fold-right (lambda (x xs) (cons (f x) xs)) l '()))
+
+(define (memq x l)
+  (cond ((null? l)
+	 #f)
+	((eq? (car l) x)
+	 l)
+	(else
+	 (memq x (cdr l)))))
 
 (define (length l)
   (fold-left (lambda (count x) (+ count 1)) 0 l))
@@ -241,3 +292,9 @@
 			    "]"))))
 	(else
 	 (error 'cannot-display))))
+
+(define (display x)
+  ((js-quote "print") (display-to-string x)))
+
+(define (newline x)
+  ((js-quote "print") "\n"))
