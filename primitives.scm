@@ -5,6 +5,9 @@
 	(list 'js-define name (list 'lambda args value)))
       (list 'js-define name value)))
 
+(defmacro let (bindings . bodies)
+  (apply list (apply list 'lambda (map car bindings) bodies) (map cadr bindings)))
+
 (define (error & args)
   ((js-quote "function (x){throw x;}") args))
 
@@ -34,8 +37,23 @@
 (define (cons a b)
   (js-object (car a) (cdr b)))
 
+(define (vector-ref v i)
+  ((js-quote "function(v,i){return v[i];}") v i))
+
+(define (vector-set! v i obj)
+  ((js-quote "function(v,i,obj){v[i]=obj;}") v i obj))
+
 (define (vector-length v)
   (.. v length))
+
+(define *interned* (js-object))
+
+(define (intern str)
+  (if (js-op str "in" *interned*)
+      (vector-ref *interned* str)
+      (let ((sym (js-object (symbol str))))
+	(vector-set! *interned* str sym)
+	sym)))
 
 (load "utils.scm")
 

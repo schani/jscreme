@@ -4,7 +4,7 @@
 
 (assert (eq? '() '()))
 (assert (eq? 1 1))
-;;(assert (eq? 'x 'x))
+(assert (eq? 'x 'x))
 
 (assert (null? '()))
 (assert (not (null? 0)))

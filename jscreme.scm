@@ -11,6 +11,8 @@
 						    ((#\<) "_lt_")
 						    ((#\-) "___")
 						    ((#\+) "_plus_")
+						    ((#\*) "_star_")
+						    ((#\!) "_bang_")
 						    (else (string c))))))
 			  so-far))))
       (recur 0 ""))))
@@ -24,7 +26,7 @@
 ;; "abc" -> "abc"
 ;; #t -> true
 ;; #f -> false
-;; abc -> { symbol: "abc" }
+;; abc -> (intern ("abc"))
 ;; (a . b) -> { car: a, cdr: b }
 
 (define (quote-to-string expr)
@@ -41,7 +43,7 @@
 	     "true"
 	     "false"))
 	((symbol? expr)
-	 (string-append "{symbol:" (quote-string (symbol->string expr)) "}"))
+	 (string-append "(intern(" (quote-string (symbol->string expr)) "))"))
 	((pair? expr)
 	 (string-append "{car:" (quote-to-string (car expr)) ",cdr:" (quote-to-string (cdr expr)) "}"))
 	(else
@@ -72,7 +74,6 @@
 ;; (js-object (a x) (b y)) -> { a: x, b: y }
 ;; (js-op a "==" b) -> (a == b)
 ;; (js-quote "null") -> null
-;; (vector-ref v k) -> (v[k])
 ;; (apply f a b c) -> (f.apply (null, [a, b].concat (c)))
 ;; (lambda (a b) c) -> function (a,b) { return c; }
 ;; (lambda (a b & c) d) -> function (a,b) { var c = listify___vector (arguments, 2); return d; }
@@ -81,13 +82,14 @@
 ;; (f a b) -> (f (a, b))
 
 (define (compile expr env)
+  (display "compiling ") (display expr) (newline)
   (letrec ((compile-body-list (lambda (l env)
 				(cond ((null? l)
 				       "")
 				      ((null? (cdr l))
 				       (string-append "return " (compile (car l) env) ";"))
 				      (else
-				       (string-append (compile car l) ";\n"
+				       (string-append (compile (car l) env) ";\n"
 						      (compile-body-list (cdr l) env)))))))
     (cond ((or (number? expr) (string? expr) (boolean? expr))
 	   (quote-to-string expr))
@@ -111,15 +113,9 @@
 					     (cdr expr)))
 			     "}"))
 	     ((js-op)
-	      (string-append (compile (cadr expr) env) (caddr expr) (compile (cadddr expr) env)))
+	      (string-append (compile (cadr expr) env) " " (caddr expr) " " (compile (cadddr expr) env)))
 	     ((js-quote)
 	      (cadr expr))
-	     ((vector-ref)
-	      (string-append "("
-			     (compile (cadr expr) env)
-			     "["
-			     (compile (caddr expr) env)
-			     "])"))
 	     ((apply)
 	      (letrec ((compile-args (lambda (args)
 				       (if (null? (cdr args))
@@ -237,9 +233,6 @@
 
 (defmacro js-macro (def body)
   ''())
-
-(js-macro (let bindings & bodies)
-	  (apply list (apply list lambda (map car bindings) bodies) (map cdr bindings)))
 
 (js-macro (cond & cases)
 	  (let ((recur (lambda (cases)
