@@ -12,6 +12,12 @@
 (assert (= 1 1))
 (assert (not (= 1 2)))
 
+(assert (boolean? #t))
+(assert (boolean? #f))
+(assert (not (boolean? '())))
+(assert (not (boolean? 0)))
+(assert (not (boolean? "")))
+
 (assert (number? 0))
 (assert (number? 1))
 (assert (not (number? '())))
@@ -24,6 +30,9 @@
 (assert (not (symbol? (vector))))
 
 (assert (equal? (symbol->string 'abc) "abc"))
+
+(assert (char? #\a))
+(assert (not (char? "ab")))
 
 (assert (string? "abc"))
 (assert (not (string? '())))

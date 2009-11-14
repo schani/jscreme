@@ -57,7 +57,7 @@
   (if x #f #t))
 
 (define (eq? a b)
-  (js-op a "==" b))
+  (js-op a "===" b))
 
 (define (null? x)
   (eq? x '()))
@@ -67,7 +67,7 @@
        (js-op (.. x constructor) "==" (js-quote "Number"))))
 
 (define (= a b)
-  (js-op a "==" b))
+  (js-op a "===" b))
 
 (define (< a b)
   (js-op a "<" b))
@@ -79,6 +79,9 @@
   (and (not (null? x))
        (js-op (.. x constructor) "==" (js-quote "Object"))
        (js-op "car" "in" x)))
+
+(define (boolean? x)
+  (or (eq? x #t) (eq? x #f)))
 
 (define (car x)
   (.. x car))
@@ -170,6 +173,10 @@
 
 (define (string-length s)
   (.. s length))
+
+(define (char? x)
+  (and (string? x)
+       (= (string-length x) 1)))
 
 (define (string-ref s i)
   ((js-quote "function(s,i){return s[i];}") s i))
