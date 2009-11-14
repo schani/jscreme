@@ -5,6 +5,9 @@
 (assert (eq? '() '()))
 (assert (eq? 1 1))
 (assert (eq? 'x 'x))
+(assert (not (eq? 0 1)))
+(assert (not (eq? 'x 'y)))
+(assert (not (eq? '() '(x))))
 
 (assert (null? '()))
 (assert (not (null? 0)))
@@ -15,3 +18,9 @@
 (assert (< -1 1))
 (assert (not (< 1 1)))
 (assert (not (< 1 0)))
+
+(assert (eq? (car '(1 . 2)) 1))
+(assert (eq? (cdr '(1 . 2)) 2))
+(assert (eq? (car (cons 1 2)) 1))
+(assert (eq? (cdr (cons 1 2)) 2))
+(assert (eq? (cdr '(0)) '()))

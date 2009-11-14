@@ -193,11 +193,13 @@
 (define (compile-toplevels exprs)
   (letrec ((macroexpand (lambda (expr macros)
 			  (if (pair? expr)
-			      (let ((binding (assq (car expr) macros))
-				    (rest (map (lambda (x) (macroexpand x macros)) (cdr expr))))
-				(if binding
-				    (apply (cdr binding) rest)
-				    (cons (macroexpand (car expr) macros) rest)))
+			      (if (eq? (car expr) 'quote)
+				  expr
+				  (let ((binding (assq (car expr) macros))
+					(rest (map (lambda (x) (macroexpand x macros)) (cdr expr))))
+				    (if binding
+					(apply (cdr binding) rest)
+					(cons (macroexpand (car expr) macros) rest))))
 			      expr)))
 	   (recur (lambda (exprs env macros)
 		    (cond ((null? exprs)
