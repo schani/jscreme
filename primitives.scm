@@ -75,6 +75,9 @@
 (define (number->string x)
   ((.. x toString)))
 
+(define (string->number x)
+  ((js-quote "parseInt") x))
+
 (define (pair? x)
   (and (not (null? x))
        (js-op (.. x constructor) "==" (js-quote "Object"))
@@ -137,7 +140,7 @@
 
 (define *interned* (js-object))
 
-(define (intern str)
+(define (string->symbol str)
   (if (js-op str "in" *interned*)
       (vector-ref *interned* str)
       (let ((sym (js-object (symbol str))))
@@ -209,8 +212,21 @@
   (and (string? x)
        (= (string-length x) 1)))
 
+(define (char<=? c1 c2)
+  (js-op c1 "<=" c2))
+
+(define (char-numeric? c)
+  (and (char<=? #\0 c) (char<=? c #\9)))
+
+(define (char-alphabetic? c)
+  (or (and (char<=? #\a c) (char<=? c #\z))
+      (and (char<=? #\A c) (char<=? c #\Z))))
+
 (define (string-ref s i)
   ((js-quote "function(s,i){return s[i];}") s i))
+
+(define (substring str start end)
+  ((.. str substr) start (- end start)))
 
 (define (string-append & args)
   (fold-left (lambda (a b) (js-op a "+" b)) "" args))
@@ -240,6 +256,9 @@
 	(else
 	 (memq x (cdr l)))))
 
+(define (char-whitespace? c)
+  (memq c '(#\space #\newline #\ht)))
+
 (define (length l)
   (fold-left (lambda (count x) (+ count 1)) 0 l))
 
@@ -259,6 +278,16 @@
 		       (recur 0))))))
 	(else
 	 (eq? a b))))
+
+(define (assoc x l)
+  (letrec ((recur (lambda (l)
+		    (cond ((null? l)
+			   #f)
+			  ((equal? (caar l) x)
+			   (car l))
+			  (else
+			   (recur (cdr l)))))))
+    (recur l)))
 
 (define (display-to-string x)
   (cond ((null? x)

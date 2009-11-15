@@ -40,7 +40,7 @@
 ;; "abc" -> "abc"
 ;; #t -> true
 ;; #f -> false
-;; abc -> (intern ("abc"))
+;; abc -> (string->symbol ("abc"))
 ;; (a . b) -> { car: a, cdr: b }
 
 (define (quote-to-string expr)
@@ -57,7 +57,7 @@
 	     "true"
 	     "false"))
 	((symbol? expr)
-	 (string-append "(" (jsify-symbol 'intern) "(" (quote-string (symbol->string expr)) "))"))
+	 (string-append "(" (jsify-symbol 'string->symbol) "(" (quote-string (symbol->string expr)) "))"))
 	((pair? expr)
 	 (string-append "{car:" (quote-to-string (car expr)) ",cdr:" (quote-to-string (cdr expr)) "}"))
 	(else

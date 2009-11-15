@@ -45,6 +45,17 @@
 
 (assert (eq? (string-ref "abc" 1) #\b))
 
+(assert (eq? (substring "abc" 1 1) ""))
+(assert (eq? (substring "abc" 0 1) "a"))
+(assert (eq? (substring "abc" 1 3) "bc"))
+
+(assert (char-numeric? #\5))
+(assert (not (char-numeric? #\a)))
+
+(assert (char-alphabetic? #\k))
+(assert (char-alphabetic? #\L))
+(assert (not (char-alphabetic? #\4)))
+
 (assert (pair? (cons 1 2)))
 (assert (not (pair? '())))
 (assert (not (pair? 1)))
@@ -111,8 +122,14 @@
 (assert (equal? (string #\a) "a"))
 (assert (equal? (string #\a #\b #\c) "abc"))
 
+(assert (equal? (string->number "123") 123))
+(assert (equal? (number->string 123) "123"))
+
 (assert (equal? (map (lambda (x) (error 'must-not-be-called)) '()) '()))
 (assert (equal? (map (lambda (x) (+ x 1)) '(1 2 3)) '(2 3 4)))
+
+(assert (equal? (assoc 2 '((1 a) (3 c))) #f))
+(assert (equal? (assoc 2 '((1 a) (2 b) (3 c))) '(2 b)))
 
 (assert (equal? (length '()) 0))
 (assert (equal? (length '(a)) 1))
