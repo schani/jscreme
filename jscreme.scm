@@ -57,5 +57,6 @@
   (lambda (port)
     (display (compile-toplevels '((load "primitives.scm")
 				  (load "compiler.scm")
+				  (load "reader.scm")
 				  (load "tests.scm")))
 	     port)))
