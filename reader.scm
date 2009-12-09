@@ -69,7 +69,7 @@
 					 ((#\t) (return #t (+ i 1)))
 					 ((#\f) (return #f (+ i 1)))
 					 ((#\\) (read-char (+ i 1)))
-					 (else (error "invalid special" c))))))
+					 (else (error "invalid special " c))))))
 	     (read-number (lambda (i)
 			    (let ((j (consume i char-numeric?)))
 			      (return (string->number (substring str i j)) j))))
