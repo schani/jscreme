@@ -11,6 +11,15 @@
 (defmacro let (bindings . bodies)
   (apply list (apply list 'lambda (map car bindings) bodies) (map cadr bindings)))
 
+(defmacro let* (bindings . bodies)
+  (letrec ((recur (lambda (bindings)
+		    (if (null? bindings)
+			(apply list 'begin bodies)
+			(let ((name (caar bindings))
+			      (value (cadar bindings)))
+			  (list (list 'lambda (list name) (recur (cdr bindings))) value))))))
+    (recur bindings)))
+
 (defmacro cond cases
   (letrec ((recur (lambda (cases)
 		    (if (null? cases)
@@ -327,3 +336,10 @@
 
 (define (newline x)
   ((js-quote "print") "\n"))
+
+(define gensym
+  (let ((counter 0))
+    (lambda ()
+      (let ((i counter))
+	(js-op counter "=" (+ counter 1)) ;FIXME: implement set!
+	(string->symbol (string-append " g" (number->string i)))))))

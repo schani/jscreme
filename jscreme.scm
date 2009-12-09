@@ -21,17 +21,18 @@
 				  (let ((binding (assq (car expr) macros))
 					(rest (map (lambda (x) (macroexpand x macros)) (cdr expr))))
 				    (if binding
-					(apply (cdr binding) rest)
+					(macroexpand (apply (cdr binding) rest) macros)
 					(cons (macroexpand (car expr) macros) rest))))
 			      expr)))
-	   (recur (lambda (exprs env macros)
+	   (recur (lambda (so-far exprs env macros)
 		    (cond ((null? exprs)
-			   "")
+			   so-far)
 			  ((and (pair? (car exprs)) (eq? (caar exprs) 'defmacro))
 			   (let ((name (cadar exprs))
 				 (args (caddar exprs))
 				 (value (car (cdddar exprs))))
-			     (recur (cdr exprs) env
+			     (recur so-far
+				    (cdr exprs) env
 				    (cons (cons name (eval (list 'lambda args
 								 (macroexpand value macros))
 							   (interaction-environment)))
@@ -41,17 +42,18 @@
 			     (cond ((and (pair? expr) (eq? (car expr) 'js-define))
 				    (let* ((name (cadr expr))
 					   (value (caddr expr))
-					   (new-env (cons name env)))
-				      (string-append "var " (jsify-symbol name) "="
-						     (compile (macroexpand value macros) new-env) ";\n"
-						     (recur (cdr exprs) new-env macros))))
+					   (var-name (jsify-symbol name))
+					   (new-env (cons (cons name var-name) env)))
+				      (recur (string-append so-far "var " var-name "="
+							    (compile (macroexpand value macros) new-env) ";\n")
+					     (cdr exprs) new-env macros)))
 				   ((and (pair? expr) (eq? (car expr) 'load))
 				    (let ((more-exprs (read-file (cadr expr))))
-				      (recur (append more-exprs (cdr exprs)) env macros)))
+				      (recur so-far (append more-exprs (cdr exprs)) env macros)))
 				   (else
-				    (string-append (compile expr env) ";\n"
-						   (recur (cdr exprs) env macros))))))))))
-    (recur exprs '() '())))
+				    (recur (string-append so-far (compile expr env) ";\n")
+					   (cdr exprs) env macros)))))))))
+    (recur "" exprs '() '())))
 
 (call-with-output-file "tests.js"
   (lambda (port)

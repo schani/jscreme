@@ -15,6 +15,7 @@
 						    ((#\+) "_plus_")
 						    ((#\*) "_star_")
 						    ((#\!) "_bang_")
+						    ((#\space) "_space_")
 						    (else (string c))))))
 			  so-far))))
       (string-append "_" (recur 0 "") "_"))))
@@ -108,9 +109,9 @@
     (cond ((or (number? expr) (char? expr) (string? expr) (boolean? expr))
 	   (quote-to-string expr))
 	  ((symbol? expr)
-	   (let ((str (jsify-symbol expr)))
-	     (if (memq expr env)
-		 str
+	   (let ((entry (assoc expr env)))
+	     (if entry
+		 (cdr entry)
 		 (error 'symbol-unbound expr))))
 	  ((pair? expr)
 	   (case (car expr)
@@ -142,18 +143,19 @@
 			       ")))")))
 	     ((lambda)
 	      (let* ((deconstructed-arglist (deconstruct-arglist (cadr expr)))
-		     (arglist (car deconstructed-arglist))
+		     (arglist (map (lambda (a) (cons a (jsify-symbol (gensym)))) (car deconstructed-arglist)))
 		     (rest-arg (cadr deconstructed-arglist))
+		     (rest-arg-name (jsify-symbol (gensym)))
 		     (body-list (cddr expr))
 		     (new-env (if rest-arg
-				  (cons rest-arg (append arglist env))
+				  (cons (cons rest-arg rest-arg-name) (append arglist env))
 				  (append arglist env))))
 		(string-append "function("
-			       (commatize (map jsify-symbol arglist))
+			       (commatize (map cdr arglist))
 			       "){"
 			       (if rest-arg
 				   (string-append "var "
-						  (jsify-symbol rest-arg)
+						  rest-arg-name
 						  "="
 						  (jsify-symbol 'listify-vector)
 						  "(arguments,"
@@ -162,15 +164,15 @@
 				   "")
 			       (compile-body-list body-list new-env)
 			       "}")))
-	     ((letrec let*) ;FIXME: the way we compile here is wrong, both for letrec and let*
+	     ((letrec)
 	      (let* ((bindings (cadr expr))
-		     (names (map car bindings))
+		     (names (map (lambda (b) (cons (car b) (jsify-symbol (gensym)))) bindings))
 		     (body-list (cddr expr))
 		     (new-env (append names env)))
 		(string-append "(function(){"
 			       (apply string-append (map (lambda (binding)
 							   (string-append "var "
-									  (jsify-symbol (car binding))
+									  (cdr (assoc (car binding) names))
 									  "="
 									  (compile (cadr binding) new-env)
 									  ";" ))

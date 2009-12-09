@@ -145,3 +145,11 @@
 (assert (equal? (display-to-string (vector)) "[]"))
 (assert (equal? (display-to-string (vector 1)) "[1]"))
 (assert (equal? (display-to-string (vector 1 2 3)) "[1 2 3]"))
+
+(assert (equal? (letrec ((a (lambda (x) (if (null? x) 0 (+ (b (cdr x)) 1))))
+			 (b (lambda (x) (a x))))
+		  (a '(a b c)))
+		3))
+(assert (equal? (letrec ((a (lambda () b)) (b 1)) (a)) 1))
+
+(assert (equal? (let ((x 1)) (let* ((a x) (x 2)) (list a x))) '(1 2)))
