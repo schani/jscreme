@@ -341,5 +341,5 @@
   (let ((counter 0))
     (lambda ()
       (let ((i counter))
-	(js-op counter "=" (+ counter 1)) ;FIXME: implement set!
+	(set! counter (+ counter 1))
 	(string->symbol (string-append " g" (number->string i)))))))

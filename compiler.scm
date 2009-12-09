@@ -189,6 +189,13 @@
 				   (compile alternative env)
 				   "null")
 			       ")")))
+	     ((set!)
+	      (let* ((name (cadr expr))
+		     (value (caddr expr))
+		     (entry (assoc name env)))
+		(if entry
+		    (string-append "(" (cdr entry) "=" (compile value env) ")")
+		    (error 'symbol-unbound name))))
 	     (else
 	      (let ((function (car expr))
 		    (args (cdr expr)))
