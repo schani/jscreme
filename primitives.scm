@@ -164,7 +164,20 @@
 (define (symbol->string x)
   (.. x symbol))
 
-(load "utils.scm")
+(define (fold-left f neut l)
+  (if (null? l)
+      neut
+      (fold-left f (f neut (car l)) (cdr l))))
+
+(define (fold-right f l neut)
+  (if (null? l)
+      neut
+      (f (car l) (fold-right f (cdr l) neut))))
+
+(define (reduce f l)
+  (if (null? l)
+      '()
+      (fold-left f (car l) (cdr l))))
 
 (define (+ & args)
   (fold-left (lambda (a b) (js-op a "+" b)) 0 args))
@@ -288,15 +301,21 @@
 	(else
 	 (eq? a b))))
 
-(define (assoc x l)
+(define (find pred l)
   (letrec ((recur (lambda (l)
 		    (cond ((null? l)
 			   #f)
-			  ((equal? (caar l) x)
+			  ((pred (car l))
 			   (car l))
 			  (else
 			   (recur (cdr l)))))))
     (recur l)))
+
+(define (assoc x l)
+  (find (lambda (y) (equal? (car y) x)) l))
+
+(define (assq x l)
+  (find (lambda (y) (eq? (car y) x)) l))
 
 (define (display-to-string x)
   (cond ((null? x)

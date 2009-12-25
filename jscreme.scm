@@ -13,7 +13,8 @@
 			      (cons expr (recur)))))))
 	(recur)))))
 
-(load "repl.scm")
+(load "toplevel.scm")
+(load "toplevel-compile.scm")
 
 (define (compile-toplevels exprs)
   (fold-left string-append "" (map (lambda (x) (toplevel-compile x read-file)) exprs)))
@@ -23,5 +24,8 @@
     (display (compile-toplevels '((load "primitives.scm")
 				  (load "compiler.scm")
 				  (load "reader.scm")
+				  (load "toplevel.scm")
+				  (load "eval.scm")
+				  (load "toplevel-compile.scm")
 				  (load "tests.scm")))
 	     port)))
