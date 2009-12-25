@@ -72,13 +72,13 @@
 	      l)))
 
 (define (deconstruct-arglist l)
-  (cond ((null? l)
-	 '(() #f))
-	((eq? (car l) '&)
-	 (list '() (cadr l)))
-	(else
+  (cond ((pair? l)
 	 (let ((rl (deconstruct-arglist (cdr l))))
-	   (list (cons (car l) (car rl)) (cadr rl))))))
+	   (list (cons (car l) (car rl)) (cadr rl))))
+	((null? l)
+	 (list '() #f))
+	(else
+	 (list '() l))))
 
 ;; 123 -> 123
 ;; "abc" -> "abc"
@@ -91,7 +91,7 @@
 ;; (js-quote "null") -> null
 ;; (apply f a b c) -> (f.apply (null, [a, b].concat (list____gt_vector(c))))
 ;; (lambda (a b) c) -> function (a,b) { return c; }
-;; (lambda (a b & c) d) -> function (a,b) { var c = listify___vector (arguments, 2); return d; }
+;; (lambda (a b . c) d) -> function (a,b) { var c = listify___vector (arguments, 2); return d; }
 ;; (letrec/let* ((a x) (b y)) c) -> (function () { var a = x; var b = y; return c; } ())
 ;; (if a b c) -> (a ? b : c)
 ;; (f a b) -> (f (a, b))

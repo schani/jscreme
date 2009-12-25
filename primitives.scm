@@ -135,7 +135,7 @@
 (define (cons a b)
   (js-object (car a) (cdr b)))
 
-(define (list & args)
+(define (list . args)
   args)
 
 (define (vector-ref v i)
@@ -179,10 +179,10 @@
       '()
       (fold-left f (car l) (cdr l))))
 
-(define (+ & args)
+(define (+ . args)
   (fold-left (lambda (a b) (js-op a "+" b)) 0 args))
 
-(define (- x & rest)
+(define (- x . rest)
   (if (null? rest)
       (js-op 0 "-" x)
       (js-op x "-" (apply + rest))))
@@ -211,10 +211,10 @@
 			    (recur (cdr l)))))))
       (recur l))))
 
-(define (vector & args)
+(define (vector . args)
   (list->vector args))
 
-(define (error & args)
+(define (error . args)
   ((js-quote "function (x){throw x;}") (list->vector args)))
 
 (defmacro assert (x)
@@ -250,12 +250,12 @@
 (define (substring str start end)
   ((.. str substr) start (- end start)))
 
-(define (string-append & args)
+(define (string-append . args)
   (fold-left (lambda (a b) (js-op a "+" b)) "" args))
 
 (define string string-append)
 
-(define (append & args)
+(define (append . args)
   (letrec ((recur (lambda (ls)
 		    (cond ((null? (cdr ls))
 			   (car ls))
