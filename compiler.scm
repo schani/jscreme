@@ -97,7 +97,7 @@
 ;; (f a b) -> (f (a, b))
 
 (define (compile expr env)
-  (display "compiling ") (display expr) (newline)
+  ;;(display "compiling ") (display expr) (newline)
   (letrec ((compile-body-list (lambda (l env)
 				(cond ((null? l)
 				       "")
