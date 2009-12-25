@@ -1,0 +1,27 @@
+<html>
+<head><title>JScreme REPL</title></head>
+<body>
+<textarea id="input"></textarea><br>
+<input type=button value="REP!" onClick="process ()">
+<div id="display"></div>
+<script type="text/javascript" src="tests.js"></script>
+<script type="text/javascript">
+function process () {
+  var input = document.getElementById ("input");
+  var str = input.value;
+  var result = _read___eval___print_ (str);
+  var content = document.getElementById ("display");
+  var b = document.createElement ("b");
+  b.textContent = str;
+  var p = document.createElement ("p");
+  p.appendChild (b);
+  var br = document.createElement ("br");
+  p.appendChild (br);
+  var div = document.createElement ("div");
+  div.textContent = result;
+  p.appendChild (div);
+  content.appendChild (p);
+  input.value = "";
+}
+</script>
+</body>
