@@ -66,7 +66,9 @@
   (if x #f #t))
 
 (define (eq? a b)
-  (js-op a "===" b))
+  (or (js-op a "===" b)
+      (and (js-op a "==" '())
+	   (js-op b "==" '()))))
 
 (define (null? x)
   (eq? x '()))
