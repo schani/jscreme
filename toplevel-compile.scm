@@ -23,12 +23,12 @@
   (toplevel-process expr read-file
 		    (lambda (name value-expr)
 		      (add-toplevel-macro name (eval value-expr (interaction-environment)))
-		      "")
+		      "null;\n")
 		    (lambda (name value-expr)
 		      (let ((var-name (jsify-symbol name)))
 			(add-toplevel-binding name var-name)
 			(string-append "var " var-name "="
-				       (compile value-expr *toplevel-bindings*) ";\n")))
+				       (compile value-expr *toplevel-bindings*) ";null;\n")))
 		    (lambda (expr)
 		      (string-append (compile expr *toplevel-bindings*) ";\n"))
 		    (lambda (results)
