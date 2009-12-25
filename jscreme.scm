@@ -27,7 +27,7 @@
 		   (load "toplevel-compile.scm")
 		   (load "repl.scm")
 		   (load "tests.scm"))))
-  (call-with-output-file "tests.js"
+  (call-with-output-file "jscreme.js"
     (lambda (port)
       (display (compile-toplevels toplevels)
 	       port)
