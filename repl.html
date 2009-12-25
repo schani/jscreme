@@ -1,9 +1,9 @@
 <html>
 <head><title>JScreme REPL</title></head>
 <body>
-<textarea id="input"></textarea><br>
-<input type=button value="REP!" onClick="process ()">
 <div id="display"></div>
+<p><textarea id="input" cols=80 rows=25></textarea><br>
+<input type=button value="REP!" onClick="process ()">
 <script type="text/javascript" src="tests.js"></script>
 <script type="text/javascript">
 function process () {
@@ -21,7 +21,6 @@ function process () {
   div.textContent = result;
   p.appendChild (div);
   content.appendChild (p);
-  input.value = "";
 }
 </script>
 </body>
