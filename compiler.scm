@@ -42,7 +42,7 @@
 ;; #t -> true
 ;; #f -> false
 ;; abc -> (string->symbol ("abc"))
-;; (a . b) -> { car: a, cdr: b }
+;; (a . b) -> ({ car: a, cdr: b })
 
 (define (quote-to-string expr)
   (cond ((null? expr)
@@ -60,7 +60,7 @@
 	((symbol? expr)
 	 (string-append "(" (jsify-symbol 'string->symbol) "(" (quote-string (symbol->string expr)) "))"))
 	((pair? expr)
-	 (string-append "{car:" (quote-to-string (car expr)) ",cdr:" (quote-to-string (cdr expr)) "}"))
+	 (string-append "({car:" (quote-to-string (car expr)) ",cdr:" (quote-to-string (cdr expr)) "})"))
 	(else
 	 (error 'cannot-quote expr))))
 
@@ -86,7 +86,7 @@
 ;; #f -> false
 ;; abc -> abc
 ;; (.. x a) -> (x.a)
-;; (js-object (a x) (b y)) -> { a: x, b: y }
+;; (js-object (a x) (b y)) -> ({ a: x, b: y })
 ;; (js-op a "==" b) -> (a == b)
 ;; (js-quote "null") -> null
 ;; (apply f a b c) -> (f.apply (null, [a, b].concat (list____gt_vector(c))))
@@ -120,13 +120,13 @@
 	     ((..)
 	      (string-append "(" (compile (cadr expr) env) "." (symbol->string (caddr expr)) ")"))
 	     ((js-object)
-	      (string-append "{"
+	      (string-append "({"
 			     (commatize (map (lambda (x)
 					       (string-append (symbol->string (car x))
 							      ":"
 							      (compile (cadr x) env)))
 					     (cdr expr)))
-			     "}"))
+			     "})"))
 	     ((js-op)
 	      (string-append "(" (compile (cadr expr) env) " " (caddr expr) " " (compile (cadddr expr) env) ")"))
 	     ((js-quote)
