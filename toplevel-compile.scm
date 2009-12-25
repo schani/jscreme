@@ -1,22 +1,35 @@
-(define (toplevel-compile expr read-file)
+(define (toplevel-process expr read-file process-macro process-binding process-expr combine)
   (if (and (pair? expr) (eq? (car expr) 'defmacro))
       (let ((name (cadr expr))
 	    (args (caddr expr))
 	    (value (car (cdddr expr))))
-	(add-toplevel-macro name (eval (list 'lambda args
-					     (macroexpand value))
-				       (interaction-environment)))
-	"")
+	(process-macro name (list 'lambda args
+				  (macroexpand value))))
       (let ((expr (macroexpand expr)))
 	(cond ((and (pair? expr) (eq? (car expr) 'js-define))
 	       (let* ((name (cadr expr))
 		      (value (caddr expr))
 		      (var-name (jsify-symbol name)))
-		 (add-toplevel-binding name var-name)
-		 (string-append "var " var-name "="
-				(compile (macroexpand value) *toplevel-bindings*) ";\n")))
+		 (process-binding name (macroexpand value))))
 	      ((and (pair? expr) (eq? (car expr) 'load))
 	       (let ((more-exprs (read-file (cadr expr))))
-		 (fold-left string-append "" (map (lambda (x) (toplevel-compile x read-file)) more-exprs))))
+		 (combine (map
+			   (lambda (x) (toplevel-process x read-file process-macro process-binding process-expr combine))
+			   more-exprs))))
 	      (else
-	       (string-append (compile expr *toplevel-bindings*) ";\n"))))))
+	       (process-expr expr))))))
+
+(define (toplevel-compile expr read-file)
+  (toplevel-process expr read-file
+		    (lambda (name value-expr)
+		      (add-toplevel-macro name (eval value-expr (interaction-environment)))
+		      "")
+		    (lambda (name value-expr)
+		      (let ((var-name (jsify-symbol name)))
+			(add-toplevel-binding name var-name)
+			(string-append "var " var-name "="
+				       (compile value-expr *toplevel-bindings*) ";\n")))
+		    (lambda (expr)
+		      (string-append (compile expr *toplevel-bindings*) ";\n"))
+		    (lambda (results)
+		      (fold-left string-append "" results))))
