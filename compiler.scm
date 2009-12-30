@@ -92,8 +92,9 @@
 ;; (apply f a b c) -> (f.apply (null, [a, b].concat (list____gt_vector(c))))
 ;; (lambda (a b) c) -> function (a,b) { return c; }
 ;; (lambda (a b . c) d) -> function (a,b) { var c = listify___vector (arguments, 2); return d; }
-;; (letrec/let* ((a x) (b y)) c) -> (function () { var a = x; var b = y; return c; } ())
+;; (letrec ((a x) (b y)) c) -> (function () { var a = x; var b = y; return c; } ())
 ;; (if a b c) -> (a ? b : c)
+;; (set! a b) -> (a = b)
 ;; (f a b) -> (f (a, b))
 
 (define (compile expr env)
