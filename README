@@ -1,0 +1,13 @@
+JScreme
+=======
+
+JScreme is a self-hosting Scheme to JavaScript compiler.  You can try
+it out here:
+
+  http://www.complang.tuwien.ac.at/schani/blog/jscreme.html
+
+To read more about it, go here:
+
+  http://schani.wordpress.com/2010/01/01/jscreme/
+
+To compile it yourself, you'll need Guile.
