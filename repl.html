@@ -1,6 +1,23 @@
 <html>
 <head><title>JScreme REPL</title></head>
 <body>
+<h1>JScreme</h1>
+
+<p>This is JScreme, a self-hosting Scheme subset to JavaScript
+compiler.  I've blogged about
+JScreme <a href="http://schani.wordpress.com/2010/01/01/jscreme/">here</a>,
+the sources are hosted
+on <a href="http://github.com/schani/jscreme">GitHub</a>.</p>
+
+<p>Below is the REPL.  Stuff you might want to try out:</p>
+
+<p><tt>(+ 1 2)</tt>
+<p><tt>(map (lambda (x) (+ x 1)) '(1 2 3))</tt>
+<p><tt>(reduce (lambda (x y) (string-append x " and " y)) '("spam" "sausage" "bacon" "spam"))</tt>
+<p><tt>(compile '(lambda (spam) (list spam spam spam)) *toplevel-bindings*)</tt>
+
+<hr>
+
 <div id="display"></div>
 <p><textarea id="input" cols=80 rows=25></textarea><br>
 <input type=button value="REP!" onClick="process ()">
